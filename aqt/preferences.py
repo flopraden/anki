@@ -271,8 +271,10 @@ Not currently enabled; click the sync button in the main window to enable."""))
         value = getattr(widget, function)()
         storeValue[name] = value
 
-    extraOptions = [
+    extraOptions = ([
     ]
+                    +[(f"{window}MultipleTime", True) for window in ["AddCards", "EditCurrent", "Browser", "OtherWindows"]]#those are the windows name, thus with caps
+    )
 
     def setupExtra(self):
         """Set in the GUI the preferences related to add-ons
