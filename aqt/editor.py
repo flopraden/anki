@@ -376,7 +376,11 @@ class Editor:
         # Triple, for each fields, with (field name, field
         # content modified so that it's image's url can be
         # used locally, and whether it is on its own line)
-        data = [(fld, self.mw.col.media.escapeImages(val), self.model["flds"][ord].get("Line alone", False)) for ord, (fld, val) in enumerate(self.note.items())]
+        data = [(fld,
+                 self.mw.col.media.escapeImages(val),
+                 self.model["flds"][ord].get("Line alone", False),
+                 self.model["flds"][ord].get("sticky", False)
+        ) for ord, (fld, val) in enumerate(self.note.items())]
         self.widget.show()
         self.updateTags()
 
@@ -507,6 +511,13 @@ class Editor:
         fieldObject = self.model['flds'][fieldNumber]
         self.mw.col.models.save(self.model, recomputeReq=False)
         fieldObject["Line alone"] = not fieldObject.get("Line alone", False)
+        self.loadNote()
+
+    def onFroze(self, fieldNumber):
+        fieldNumber = int(fieldNumber)
+        fieldObject = self.model['flds'][fieldNumber]
+        fieldObject["sticky"] = not fieldObject.get("sticky", False)
+        self.mw.col.models.save(self.model)
         self.loadNote()
 
     # Tag handling
@@ -921,7 +932,7 @@ to a cloze type first, via Edit>Change Note Type."""))
         key=onKey,
         blur=onBlur,
         toggleLineAlone=onToggleLineAlone,
-        #mceTrigger=onMceTrigger,
+        toggleFroze=onFroze,
     )
 
 # Pasting, drag & drop, and keyboard layouts

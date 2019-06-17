@@ -60,7 +60,6 @@ function onKey() {
 	 If no other action is done in .6 seconds, tell Python what change did occur
 	 */
 
-
     // esc clears focus, allowing dialog to close
     if (window.event.which === 27) {
         currentField.blur();
@@ -187,7 +186,8 @@ function onFocus(elem) {
         return;
     }
     currentField = elem;
-    pycmd("focus:" + currentFieldOrdinal());
+	cmd = "focus:" + currentFieldOrdinal();
+    pycmd(cmd);
     enableButtons();
     // don't adjust cursor on mouse clicks
     if (mouseDown) {
@@ -268,6 +268,11 @@ function changeSize(fieldNumber){
 	pycmd("toggleLineAlone:"+fieldNumber);
 }
 
+function toggleFroze(fieldNumber){
+	saveNow(true);
+	pycmd("toggleFroze:"+fieldNumber);
+}
+
 function onBlur() {
 	/*Tells python that it must save. Either by key if current field
       is still active. Otherwise by blur.  If current field is not
@@ -297,8 +302,9 @@ function saveField(type) {
         // no field has been focused yet
         return;
     }
+	cmd = type + ":" + currentFieldOrdinal() + ":" + currentNoteId + ":" + currentField.innerHTML;
     // type is either 'blur' or 'key'
-    pycmd(type + ":" + currentFieldOrdinal() + ":" + currentNoteId + ":" + currentField.innerHTML);
+    pycmd(cmd);
 }
 
 function currentFieldOrdinal() {
@@ -361,10 +367,13 @@ function createDiv(ord,  fieldContent, nbCol){
 }
 
 function createNameTd(ord, fieldName, nbColThisField, nbColTotal, sticky){
+	img = (sticky?"":"un")+"frozen.png";
+	title =(sticky?"Unf":"F")+"reeze field "+fieldName;
 	txt = "<td class='fname' colspan={0}><span>{1}</span>".format(nbColThisField, fieldName);
 	if (nbColTotal>1){
 		txt+= "<input type='button' tabIndex='-1' value='Change size' onClick='changeSize({0})'/>".format(ord);
 	}
+	txt+="<img width='15px' height='15px' title='{0}' src='/_anki/imgs/{1}' onClick='toggleFroze({2})'/></td>".format(title, img, ord);
 	return txt;
 }
 
@@ -383,13 +392,13 @@ function setFields(fields, nbCol) {
         var fieldName = fields[i][0];
         var fieldContent = fields[i][1];
 		var alone = fields[i][2];
+		var sticky = fields[i][3];
         if (!fieldContent) {
             fieldContent = "<br>";
         }
-		//console.log("fieldName: "+fieldName+", fieldContent: "+fieldContent+", alone: "+alone);
 		nbColThisField = (alone)?nbCol:1;
 		fieldContentHtml = createDiv(i, fieldContent, nbColThisField);
-		fieldNameHtml = createNameTd(i, fieldName, nbColThisField, nbCol)
+		fieldNameHtml = createNameTd(i, fieldName, nbColThisField, nbCol, sticky)
 		if (alone){
 			nameTd = fieldNameHtml
 			txt += "<tr>"+fieldNameHtml+"</tr><tr>"+fieldContentHtml+"</tr>";
@@ -472,8 +481,6 @@ var filterHTML = function (html, internal, extendedMode) {
         outHtml = outHtml.replace(/[\n\t ]+/g, " ");
     }
     outHtml = outHtml.trim();
-    //console.log(`input html: ${html}`);
-    //console.log(`outpt html: ${outHtml}`);
     return outHtml;
 };
 
