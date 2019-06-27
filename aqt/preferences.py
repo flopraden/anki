@@ -272,6 +272,8 @@ Not currently enabled; click the sync button in the main window to enable."""))
         storeValue[name] = value
 
     extraOptions = [
+        ("factorAddDay", 0.33, False),
+        ("factorRemoveDay", 0.33, False),
     ]
 
     def setupExtra(self):
