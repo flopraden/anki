@@ -399,6 +399,9 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
           </widget>
          </item>
          <item row="0" column="2">
@@ -486,6 +489,13 @@
           </property>
           <property name="wordWrap">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="limitAllCards">
+          <property name="text">
+           <string>Limit the total number of cards seen by day in a deck</string>
           </property>
          </widget>
         </item>

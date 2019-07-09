@@ -172,20 +172,24 @@ to their original deck.""")
             return '<div style="white-space: pre-wrap;">%s</div>' % (
                 self.mw.col.sched.finishedMsg())
         else:
-            return f'''
-<table width=400 cellpadding=5>
-<tr><td align=center valign=top>
-<table cellspacing=5>
-<tr><td>%s:</td><td><b><font color={colNew}>%s</font></b></td></tr>
-<tr><td>%s:</td><td><b><font color={colLearn}>%s</font></b></td></tr>
-<tr><td>%s:</td><td><b><font color={colRev}>%s</font></b></td></tr>
-</table>
-</td><td align=center>
-%s</td></tr></table>''' % (
-    _("New"), counts[0],
-    _("Learning"), counts[1],
-    _("To Review"), counts[2],
-    but("study", _("Study Now"), id="study",extra=" autofocus"))
+            l = [
+                (_("Learning"), counts[1], colLearn),
+                (_("New"), counts[0], colNew),
+                (_("To Review"), counts[2], colRev),
+            ]
+            from aqt import mw
+            if mw and mw.pm.profile.get("limitAllCards", False):
+                l.append(("""{_("New")} + {_("To Review")}""", counts[3], colToday))
+            return ('''
+            <table width=400 cellpadding=5>
+            <tr><td align=center valign=top>
+            <table cellspacing=5>'''
+                   +"\n              ".join([f'''<tr><td>{string}:</td><td><b><font color={col}>{count}</font></b></td></tr>'''
+                               for string, count, col in l])
+                   +f'''\
+             </table>
+           </td><td align=center>
+           {but("study", _("Study Now"), id="study",extra=" autofocus")}</td></tr></table>''')
 
 
     _body = """

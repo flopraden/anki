@@ -5,6 +5,7 @@ from operator import itemgetter
 
 from anki.consts import NEW_CARDS_RANDOM
 from aqt.qt import *
+from PyQt5 import QtWidgets
 import aqt
 from aqt.utils import showInfo, showWarning, openHelp, getOnlyText, askUser, \
     tooltip, saveGeom, restoreGeom
@@ -20,6 +21,14 @@ class DeckConf(QDialog):
         self._origNewOrder = None
         self.form = aqt.forms.dconf.Ui_Dialog()
         self.form.setupUi(self)
+        if mw.pm.profile.get("limitAllCards", False):
+            self.form.totalPerDay = QtWidgets.QSpinBox(self.form.tab_5)
+            self.form.totalPerDay.setObjectName("totalPerDay")
+            self.form.gridLayout_5.addWidget(self.form.totalPerDay, 1, 1, 1, 1)
+            self.form.label_16 = QtWidgets.QLabel(self.form.tab_5)
+            self.form.label_16.setObjectName("label_16")
+            self.form.gridLayout_5.addWidget(self.form.label_16, 1, 0, 1, 1)
+            self.form.label_16.setText(_("total card/day"))
         self.mw.checkpoint(_("Options"))
         self.setupCombos()
         self.setupConfs()
@@ -198,6 +207,8 @@ class DeckConf(QDialog):
         f.leechAction.setCurrentIndex(c['leechAction'])
         # general
         c = self.conf
+        if self.mw.pm.profile.get("limitAllCards", False):
+            f.totalPerDay.setValue(c.get('perDay', 1000))
         f.maxTaken.setValue(c['maxTaken'])
         f.showTimer.setChecked(c.get('timer', 0))
         f.autoplaySounds.setChecked(c['autoplay'])
@@ -285,6 +296,8 @@ class DeckConf(QDialog):
         c['timer'] = f.showTimer.isChecked() and 1 or 0
         c['autoplay'] = f.autoplaySounds.isChecked()
         c['replayq'] = f.replayQuestion.isChecked()
+        if self.mw.pm.profile.get("limitAllCards", False):
+            c['perDay'] = f.totalPerDay.value()
         # description
         self.deck['desc'] = f.desc.toPlainText()
         self.mw.col.decks.save(self.deck)

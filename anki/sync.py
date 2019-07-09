@@ -262,12 +262,12 @@ class Syncer:
                 return "model had usn = -1"
         if found:
             self.col.models.save()
-        self.col.sched.reset()
+        self.col.sched.reset(sync=True)
         # check for missing parent decks
         self.col.sched.deckDueList()
         # return summary of deck
         return [
-            list(self.col.sched.counts()),
+            list(self.col.sched.counts(sync=True)),
             self.col.db.scalar("select count() from cards"),
             self.col.db.scalar("select count() from notes"),
             self.col.db.scalar("select count() from revlog"),
