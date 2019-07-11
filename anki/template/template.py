@@ -72,17 +72,9 @@ class Template:
         self.context = context or {}
         self.compile_regexps()
 
-    def render(self, template=None, context=None, encoding=None):
+    def render(self, *args, **kwargs):
         """Turns a Mustache template into something wonderful."""
-        template = template or self.template
-        context = context or self.context
-
-        self.showAField = False
-        template = self.render_sections(template, context)
-        result = self.render_tags(template, context)
-        if encoding is not None:
-            result = result.encode(encoding)
-        return result, self.showAField
+        return self.renderAndIsFieldPresent(*args, **kwargs)[0]
 
     def renderAndIsFieldPresent(self, template=None, context=None, encoding=None):
         """A pair with:
@@ -96,7 +88,7 @@ class Template:
         result = self.render_tags(template, context)
         if encoding is not None:
             result = result.encode(encoding)
-        return result, showAField
+        return result, self.showAField
 
     def compile_regexps(self):
         """Compiles our section and tag regular expressions."""
@@ -208,6 +200,10 @@ class Template:
             mods, tag = parts[:-1], parts[-1] #py3k has *mods, tag = parts
 
         txt = get_or_attr(context, tag)
+        if txt is None:
+            return '{unknown field %s}' % tag_name
+        elif bool(txt.strip()):### MODIFIED
+            self.showAField = True
 
         #Since 'text:' and other mods can affect html on which Anki relies to
         #process clozes, we need to make sure clozes are always
@@ -226,7 +222,7 @@ class Template:
             elif mod == 'type':
                 # type answer field; convert it to [[type:...]] for the gui code
                 # to process
-                return "[[%s]]" % tag_name, False
+                return "[[%s]]" % tag_name
             elif mod.startswith('cq-') or mod.startswith('ca-'):
                 # cloze deletion
                 mod, extra = mod.split("-")
@@ -236,9 +232,8 @@ class Template:
                 mod, extra = re.search(r"^(.*?)(?:\((.*)\))?$", mod).groups()
                 txt = runFilter('fmod_' + mod, txt or '', extra or '', context,
                                 tag, tag_name)
-                if txt is None:
-                    return '{unknown field %s}' % tag_name, False
-        return txt, True
+
+        return txt
 
     def clozeText(self, txt, ord, type):
         reg = clozeReg

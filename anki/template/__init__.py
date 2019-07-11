@@ -13,7 +13,7 @@ def renderAndIsFieldPresent(template, context=None, **kwargs):
     """
     context = context and context.copy() or {}
     context.update(kwargs)
-    return Template(template, context).render()
+    return Template(template, context).renderAndIsFieldPresent()
 
 def render(template, context=None, **kwargs):
     return renderAndIsFieldPresent(template, context=context, **kwargs)[0]
