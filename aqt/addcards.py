@@ -3,6 +3,7 @@
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 """The window obtained from main by pressing A, or clicking on "Add"."""
 from anki.lang import _
+from anki.notes import Note
 
 from aqt.qt import *
 import aqt.forms
@@ -24,10 +25,10 @@ class AddCards(QDialog):
         self.setWindowTitle(_("Add"))
         self.setMinimumHeight(300)
         self.setMinimumWidth(400)
-        self.setupChoosers()
         self.setupEditor()
         self.setupButtons()
         self.onReset()
+        self.setupChoosers()
         self.history = []
         restoreGeom(self, "add")
         addHook("reset",lambda: self.onResetSameModel)
