@@ -399,6 +399,9 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
           </widget>
          </item>
          <item row="0" column="2">
@@ -609,6 +612,13 @@
          <widget class="QCheckBox" name="keepEmptyNote">
           <property name="text">
            <string>When a note has no more card, warns instead of deleting it.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="limitAllCards">
+          <property name="text">
+           <string>Limit the total number of cards seen by day in a deck</string>
           </property>
          </widget>
         </item>

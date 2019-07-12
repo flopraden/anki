@@ -278,6 +278,7 @@ Not currently enabled; click the sync button in the main window to enable."""))
         ("exportSiblings",),
         ("keepEmptyNote", True),
         ("keepSeenCard", True),
+        ("limitAllCards", True),
         ("noteWithoutCard", True),
         ("multipleNoteWithSameFirstFieldInImport", ),
         ("newLineInBatchEdit",),

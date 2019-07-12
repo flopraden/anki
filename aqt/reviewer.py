@@ -524,13 +524,16 @@ time = %(time)d;
             counts = list(self.mw.col.sched.counts())
         else:
             counts = list(self.mw.col.sched.counts(self.card))
+        if self.mw.pm.profile.get("limitAllCards", False):
+            counts[0] = min(counts[0], counts[3])
+            counts[2] = min(counts[2], counts[3])
         idx = self.mw.col.sched.countIdx(self.card)
         counts[idx] = "<u>%s</u>" % (counts[idx])
-        space = " + "
-        ctxt = f'<font color="{colNew}">%s</font>' % counts[0]
-        ctxt += space + f'<font color="{colLearn}">%s</font>' % counts[1]
-        ctxt += space + f'<font color="{colRev}">%s</font>' % counts[2]
-        return ctxt
+        return " + ".join([f'<font color="{col}">{count}</font>'
+                    for col, count in [
+                            (colNew, counts[0]),
+                            (colLearn, counts[1]),
+                            (colRev, counts[2]),]])
 
     def _defaultEase(self):
         if self.mw.col.sched.answerButtons(self.card) == 4:

@@ -53,11 +53,12 @@ class Scheduler(BothScheduler):
         card.usn = self.col.usn()
         card.flushSched()
 
-    def counts(self, card=None):
+    def counts(self, card=None, sync=False):
         """The three numbers to show in anki deck's list/footer.
         Number of new cards, learning repetition, review card.
 
         If cards, then the tuple takes into account the card.
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
         """
         counts = [self.newCount, self.lrnCount, self.revCount]
         if card:
@@ -66,6 +67,14 @@ class Scheduler(BothScheduler):
                 counts[1] += card.left // 1000
             else:
                 counts[idx] += 1
+        cur = self.col.decks.current()
+        conf = self.col.decks.confForDid(cur['id'])
+        from aqt import mw
+        if (not sync) and self.col.conf.get("limitAllCards", False):
+            today = conf['perDay'] - cur['revToday'][1] - cur['newToday'][1]
+            counts.append(today)
+            # counts[0] = max(counts[0], today)
+            # counts[2] = max(counts[2], today)
         return tuple(counts)
 
     def countIdx(self, card):
@@ -240,20 +249,27 @@ class Scheduler(BothScheduler):
     # New cards
     ##########################################################################
 
-    def _deckNewLimitSingle(self, g):
-        """Maximum number of new card to see today for deck g, not considering parent limit.
+    def _deckNewLimitSingle(self, deck, sync=False):
+        """Maximum number of new card to see today for deck deck, not considering parent limit.
 
-        If g is a dynamic deck, then reportLimit.
+        If deck is a dynamic deck, then reportLimit.
         Otherwise the number of card to see in this deck option, plus the number of card exceptionnaly added to this deck today.
 
         keyword arguments:
-        g -- a deck dictionnary
+        deck -- a deck dictionnary
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
         """
-        if g['dyn']:
+        if deck['dyn']:
             return self.reportLimit
-        c = self.col.decks.confForDid(g['id'])
-        ret = max(0, c['new']['perDay'] - g['newToday'][1])
-        return ret
+        c = self.col.decks.confForDid(deck['id'])
+        nbNewToSee = c['new']['perDay'] - deck['newToday'][1]
+        from aqt import mw
+        if (not sync) and mw and mw.pm.profile.get("limitAllCards", False):
+            nbCardToSee = c.get('perDay', 1000) - deck['revToday'][1] - deck['newToday'][1]
+            limit = min(nbNewToSee, nbCardToSee)
+        else:
+            limit = nbNewToSee
+        return max(0, limit)
 
     # Learning queues
     ##########################################################################
@@ -475,19 +491,31 @@ and due <= ? limit ?)""" ,
     # Reviews
     ##########################################################################
 
-    def _deckRevLimit(self, did):
-        return self._deckNewLimit(did, self._deckRevLimitSingle)
+    def _deckRevLimit(self, did, sync=False):
+        """
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
+        return self._deckNewLimit(did, lambda deck: self._deckRevLimitSingle(deck, sync=sync))
 
-    def _deckRevLimitSingle(self, d):
-        """Maximum number of card to review today in deck d.
+    def _deckRevLimitSingle(self, deck, sync=False):
+        """Maximum number of card to review today in deck deck.
 
         self.reportLimit for dynamic deck. Otherwise the number of review according to deck option, plus the number of review added in custom study today.
         keyword arguments:
-        d -- a deck object"""
-        if d['dyn']:
+        deck -- a deck object
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
+        if deck['dyn']:
             return self.reportLimit
-        c = self.col.decks.confForDid(d['id'])
-        return max(0, c['rev']['perDay'] - d['revToday'][1])
+        c = self.col.decks.confForDid(deck['id'])
+        nbRevToSee = c['rev']['perDay'] - deck['revToday'][1]
+        from aqt import mw
+        if (not sync) and mw and mw.pm.profile.get("limitAllCards", False):
+            nbCardToSee = c.get('perDay', 1000) - deck['revToday'][1] - deck['newToday'][1]
+            limit = min(nbRevToSee, nbCardToSee)
+        else:
+            limit = nbRevToSee
+        return max(0, limit)
 
     def _revForDeck(self, did, lim):
         """number of cards to review today for deck did
@@ -501,8 +529,11 @@ select count() from
 and due <= ? limit ?)""",
             did, self.today, lim)
 
-    def _resetRevCount(self):
-        """Set revCount"""
+    def _resetRevCount(self, sync=False):
+        """
+        Set revCount
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
         def cntFn(did, lim):
             """Number of review cards to see today for deck with id did. At most equal to lim."""
             return self.col.db.scalar(f"""
@@ -510,10 +541,13 @@ select count() from (select id from cards where
 did = ? and queue = {QUEUE_REV} and due <= ? limit %d)""" % (lim),
                                       did, self.today)
         self.revCount = self._walkingCount(
-            self._deckRevLimitSingle, cntFn)
+            lambda deck: self._deckRevLimitSingle(deck, sync), cntFn)
 
-    def _resetRev(self):
-        super()._resetRev()
+    def _resetRev(self, sync=False):
+        """
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
+        super()._resetRev(sync=sync)
         self._revDids = self.col.decks.active()[:]
 
     def _fillRev(self):
@@ -890,11 +924,11 @@ did = ?, queue = %s, due = ?, usn = ? where id = ?""" % queue, data)
             self.col.log(self.today, self.dayCutoff)
         # update all daily counts, but don't save decks to prevent needless
         # conflicts. we'll save on card answer instead
-        def update(g):
+        def update(deck):
             for t in "new", "rev", "lrn", "time":
                 key = t+"Today"
-                if g[key][0] != self.today:
-                    g[key] = [self.today, 0]
+                if deck[key][0] != self.today:
+                    deck[key] = [self.today, 0]
         for deck in self.col.decks.all():
             update(deck)
         # unbury if the day has rolled over

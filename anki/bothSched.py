@@ -65,16 +65,18 @@ class BothScheduler:
             card.startTimer()
             return card
 
-    def reset(self):
+    def reset(self, sync=False):
         """
         Deal with the fact that it's potentially a new day.
         Reset number of learning, review, new cards according to current decks
         empty queues. Set haveQueues to true
+
+        sync -- whether we need to compute as in original anki, for synchronization to succeed.
         """
         self._updateCutoff()
         self._resetLrn()
-        self._resetRev()
-        self._resetNew()
+        self._resetRev(sync=sync)
+        self._resetNew(sync=sync)
         self._haveQueues = True
 
     def dueForecast(self, days=7):
@@ -107,11 +109,11 @@ order by due""" % (self._deckLimit()),
         to this decks and all of its ancestors.
         """
         key = type+"Today"
-        for g in ([self.col.decks.get(card.did)] +
+        for deck in ([self.col.decks.get(card.did)] +
                   self.col.decks.parents(card.did)):
             # add
-            g[key][1] += cnt
-            self.col.decks.save(g)
+            deck[key][1] += cnt
+            self.col.decks.save(deck)
 
     def extendLimits(self, new, rev):
         """Decrease the limit of new/rev card to see today to this deck, its
@@ -123,16 +125,16 @@ order by due""" % (self._deckLimit()),
         parents = self.col.decks.parents(cur['id'])
         children = [self.col.decks.get(did) for (name, did) in
                     self.col.decks.children(cur['id'])]
-        for g in [cur] + parents + children:
+        for deck in [cur] + parents + children:
             # add
-            g['newToday'][1] -= new
-            g['revToday'][1] -= rev
-            self.col.decks.save(g)
+            deck['newToday'][1] -= new
+            deck['revToday'][1] -= rev
+            self.col.decks.save(deck)
 
     def _walkingCount(self, limFn=None, cntFn=None):
         """The sum of cntFn applied to each active deck.
 
-        limFn -- function which associate to each deck obejct the maximum number of card to consider
+        limFn -- function which associate to each deck object the maximum number of card to consider
         cntFn -- function which, given a deck id and a limit, return a number of card at most equal to this limit."""
         tot = 0
         pcounts = {}# Associate from each id of a parent deck p, the maximal number of cards of deck p which can be seen, minus the card found for its descendant already considered
@@ -176,8 +178,8 @@ order by due""" % (self._deckLimit()),
         grps -- [deckname, did, rev, lrn, new]
         """
         # first, split the group names into components
-        for g in grps:
-            g[0] = g[0].split("::")
+        for deck in grps:
+            deck[0] = deck[0].split("::")
         # and sort based on those components
         grps.sort(key=itemgetter(0))
         # then run main function
@@ -186,19 +188,25 @@ order by due""" % (self._deckLimit()),
     # New cards
     ##########################################################################
 
-    def _resetNewCount(self):
-        """Set newCount to the counter of new cards for the active decks."""
+    def _resetNewCount(self, sync=False):
+        """
+        Set newCount to the counter of new cards for the active decks.
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
         # Number of card in deck did, at most lim
         def cntFn(did, lim):
             ret = self.col.db.scalar(f"""
 select count() from (select 1 from cards where
 did = ? and queue = {QUEUE_NEW_CRAM} limit ?)""", did, lim)
             return ret
-        self.newCount = self._walkingCount(self._deckNewLimitSingle, cntFn)
+        self.newCount = self._walkingCount(lambda deck:self._deckNewLimitSingle(deck, sync=sync), cntFn)
 
-    def _resetNew(self):
-        """Set newCount, newDids, newCardModulus. Empty newQueue. """
-        self._resetNewCount()
+    def _resetNew(self, sync=False):
+        """
+        Set newCount, newDids, newCardModulus. Empty newQueue.
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
+        self._resetNewCount(sync=sync)
         self._newDids = self.col.decks.active()[:]
         self._newQueue = []
         self._updateNewCardRatio()
@@ -266,8 +274,8 @@ did = ? and queue = {QUEUE_NEW_CRAM} limit ?)""", did, lim)
         sel = self.col.decks.get(did)
         lim = -1
         # for the deck and each of its parents
-        for g in [sel] + self.col.decks.parents(did):
-            rem = fn(g)
+        for deck in [sel] + self.col.decks.parents(did):
+            rem = fn(deck)
             if lim == -1:
                 lim = rem
             else:
@@ -419,9 +427,12 @@ did = ? and queue = {QUEUE_DAY_LRN} and due <= ? limit ?""",
     # Reviews
     ##########################################################################
 
-    def _resetRev(self):
-        """Set revCount, empty _revQueue, _revDids"""
-        self._resetRevCount()
+    def _resetRev(self, sync=False):
+        """
+        Set revCount, empty _revQueue, _revDids
+        sync -- whether it's called from sync, and the return must satisfies sync sanity check
+        """
+        self._resetRevCount(sync=sync)
         self._revQueue = []
 
     def _getRevCard(self):
@@ -431,7 +442,7 @@ did = ? and queue = {QUEUE_DAY_LRN} and due <= ? limit ?""",
 
     def totalRevForCurrentDeck(self):
         return self.col.db.scalar(
-            """
+            f"""
 select count() from cards where id in (
 select id from cards where did in %s and queue = {QUEUE_REV} and due <= ? limit ?)"""
             % ids2str(self.col.decks.active()), self.today, self.reportLimit)

@@ -19,8 +19,8 @@ usn -- Update sequence number: used in same way as other usn vales in db
 desc -- deck description, it is shown when cards are learned or reviewd
 dyn -- 1 if dynamic (AKA filtered) deck,
 collapsed -- true when deck is collapsed,
-extendNew -- extended new card limit (for custom study). Potentially absent, only used in aqt/customstudy.py. By default 10
-extendRev -- extended review card limit (for custom study), Potentially absent, only used in aqt/customstudy.py. By default 10.
+extendNew -- extended new card limit (for custom study). Potentially absent, only used in aqt/customstudy.py, it serves to recall the last extension done and put it as default in custom study. By default 10
+extendRev -- similar to extendNew, but for review cards.
 name -- name of deck,
 browserCollapsed -- true when deck collapsed in browser,
 id -- deck ID (automatically generated long),
