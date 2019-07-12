@@ -806,6 +806,35 @@ class GetAddons(QDialog):
 # Editing config
 ######################################################################
 
+def readableJson(text):
+    """Text, where \n are replaced with new line. Unless it's preceded by a odd number of \."""
+    l=[]
+    numberOfSlashOdd=False
+    numberOfQuoteOdd=False
+    for char in text:
+        if char == "n" and numberOfQuoteOdd and numberOfSlashOdd:
+            l[-1]="\n"
+            debug("replacing last slash by newline")
+        else:
+            l.append(char)
+            if char=="\n":
+                char="newline"
+            debug(f"adding {char}")
+
+        if char == "\"":
+            if not numberOfSlashOdd:
+                numberOfQuoteOdd = not numberOfQuoteOdd
+                debug(f"numberOfQuoteOdd is now {numberOfQuoteOdd}")
+
+        if char == "\\":
+            numberOfSlashOdd = not numberOfSlashOdd
+        else:
+            numberOfSlashOdd = False
+        debug(f"numberOfSlashOdd is now {numberOfSlashOdd}")
+    return "".join(l)
+
+
+
 class ConfigEditor(QDialog):
 
     def __init__(self, dlg, addon, conf):
@@ -843,8 +872,7 @@ class ConfigEditor(QDialog):
 
     def updateText(self, conf):
         self.form.editor.setPlainText(
-            json.dumps(conf, ensure_ascii=False, sort_keys=True,
-                       indent=4, separators=(',', ': ')))
+            readableJson(json.dumps(conf,sort_keys=True,indent=4, separators=(',', ': '))))
 
     def onClose(self):
         saveGeom(self, "addonconf")
@@ -913,10 +941,12 @@ incorporatedAddonsSet = {
     Addon("Export cards selected in the Browser", 1983204951, 1560768960, "f8990da153af2745078e7b3c33854d01cb9fa304", "https://github.com/Arthur-Milchior/anki-export-from-browser"),
     Addon("If a note has no more card warns instead of deleting it", 2018640062, 1560126140, "4a854242d06a05b2ca801a0afc29760682004782", "https://github.com/Arthur-Milchior/anki-keep-empty-note"),
     Addon("Improving change note type", 513858554, 1560753393, "4ece9f1da85358bce05a75d3bbeffa91d8c17ad4", "https://github.com/Arthur-Milchior/anki-change-note-type-clozes"),
+    Addon("Keep model of add cards", 424778276, 1553438887, "64bdf3c7d8e252d6f69f0a423d2db3c23ce6bc04", "https://github.com/Arthur-Milchior/anki-keep-model-in-add-cards"),
     Addon("Limit number of cards by day both new and review", 602339056, 1562849512, "72f2ea268fa8b116f9aecde968dc0aa324b33636", "https://github.com/Arthur-Milchior/anki-limit-to-both-new-and-revs"),
     Addon("Long term backups", 529955533, gitHash="cf34f99c6c74e11b49928adb6876123fd1fa83dd", gitRepo = "https://github.com/Arthur-Milchior/anki-old-backup"),
-    Addon("Keep model of add cards", 424778276, 1553438887, "64bdf3c7d8e252d6f69f0a423d2db3c23ce6bc04", "https://github.com/Arthur-Milchior/anki-keep-model-in-add-cards"),
+    Addon("Newline in strings in add-ons configurations", 112201952, 1560116341, "c02ac9bbbc68212da3d2bccb65ad5599f9f5af97", "https://github.com/Arthur-Milchior/anki-json-new-line"),
     Addon("Open Added Today from Reviewer", 861864770, 1561610680, gitRepo = "https://github.com/glutanimate/anki-addons-misc"), #repo contains many add-ons. Thus hash seems useless. 47a218b21314f4ed7dd62397945c18fdfdfdff71
+
 }
 
 incorporatedAddonsDict = {**{addon.name: addon for addon in incorporatedAddonsSet if addon.name},

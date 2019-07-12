@@ -126,6 +126,12 @@ day for the last month, one by month for the last year, and one by
 year. So that you can recover some old part of your collection.
 
 This can be deactivated from the back-up tab of the preferences window.
+
+## New line in Json (112201952)
+In order to lead configurations be easier to edit, this add-on allow
+newline in json strings. It allow add newlines in the add-on
+configuration editor.
+
 ## Remove "Map to" in item import window for CSV (46741504)
 Because of this text, the keyboard can't be used to search a field. I
 thus remove it.
