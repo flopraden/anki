@@ -273,6 +273,7 @@ Not currently enabled; click the sync button in the main window to enable."""))
 
     extraOptions = [
         ("allowEmptyFirstField", ),
+        ("changeModelWithoutFullSync", False, True, False),
         ("noteWithoutCard", True),
         ("multipleNoteWithSameFirstFieldInImport", ),
         ("newLineInBatchEdit",),
