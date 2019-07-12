@@ -276,6 +276,7 @@ Not currently enabled; click the sync button in the main window to enable."""))
         ("changeModelWithoutFullSync", False, True, False),
         ("compileLaTeX", ),
         ("exportSiblings",),
+        ("keepEmptyNote", True),
         ("keepSeenCard", True),
         ("noteWithoutCard", True),
         ("multipleNoteWithSameFirstFieldInImport", ),
