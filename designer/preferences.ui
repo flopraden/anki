@@ -427,6 +427,16 @@
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Also keep some long term back-ups</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="openBackupFolder">
          <property name="text">
           <string>&lt;a href=&quot;backups&quot;&gt;Open backup folder&lt;/a&gt;</string>
@@ -619,6 +629,16 @@
          <widget class="QCheckBox" name="limitAllCards">
           <property name="text">
            <string>Limit the total number of cards seen by day in a deck</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_2">
+          <property name="text">
+           <string>Do some long term backups (days, month, years)</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
