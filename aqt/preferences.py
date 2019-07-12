@@ -272,7 +272,9 @@ Not currently enabled; click the sync button in the main window to enable."""))
         storeValue[name] = value
 
     extraOptions = [
+        ("allowEmptyFirstField", ),
         ("noteWithoutCard", True),
+        ("multipleNoteWithSameFirstFieldInImport", ),
     ]
 
     def setupExtra(self):
