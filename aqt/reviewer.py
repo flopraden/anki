@@ -687,7 +687,7 @@ time = %(time)d;
             return
         self.mw.checkpoint(_("Delete"))
         cnt = len(self.card.note().cards())
-        self.mw.col.remNotes([self.card.note().id])
+        self.mw.col.remNotes([self.card.note().id], reason=f"Deletion of note {id} requested from the reviewer.")
         self.mw.reset()
         tooltip(ngettext(
             "Note and its %d card deleted.",
