@@ -4,6 +4,7 @@
 
 from anki.utils import fieldChecksum, intTime, \
     joinFields, splitFields, stripHTMLMedia, timestampID, guid64
+from aqt.utils import tooltip
 
 class Note:
 
@@ -78,6 +79,32 @@ from notes where id = ?""", self.id)
         self._fmap = self.col.models.fieldMap(self._model)
         self.scm = self.col.scm
 
+    def tagTex(self, mod = None):
+        """Add tag LaTeXError if the note has a LaTeX error. Remove it
+        otherwise.
+
+        Alert when an error appear, tooltip when it disappears.
+
+        """
+        someError=False
+        for field in self.fields:
+            error = self.col.media.filesInStrOrErr(self.mid, field)[1]
+            someError = someError or error
+        from aqt import mw
+        if someError:
+            if self.hasTag("LaTeXError"):
+                if mw:#in case of test, no tooltip
+                    tooltip("Some LaTex compilation error remains.")
+            else:
+                self.addTag("LaTeXError")
+                if mw:
+                    tooltip("There was some LaTex compilation error.")
+        else:
+            if self.hasTag("LaTeXError"):
+                self.delTag("LaTeXError")
+                if mw:
+                    tooltip("There are no more LaTeX error.")
+
     def flush(self, mod=None):
         """If fields or tags have changed, write changes to disk.
 
@@ -92,6 +119,9 @@ from notes where id = ?""", self.id)
         mod -- A modification timestamp"""
         assert self.scm == self.col.scm
         self._preFlush()
+        from aqt import mw
+        if self.col.conf.get("compileLaTeX", True):
+            self.tagTex(mod)
         sfld = stripHTMLMedia(self.fields[self.col.models.sortIdx(self._model)])
         tags = self.stringTags()
         fields = self.joinedFields()
