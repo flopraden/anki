@@ -286,6 +286,9 @@ Not currently enabled; click the sync button in the main window to enable."""))
         ("preserveCreation", True),
         ("preserveName", True),
         ("preserveReviewInfo", True),
+        ("factorAddDay", 0.33, False),
+        ("factorRemoveDay", 0.33, False),
+
     ]
                     +[(f"{window}MultipleTime", True) for window in ["AddCards", "EditCurrent", "Browser", "OtherWindows"]]#those are the windows name, thus with caps
     )
