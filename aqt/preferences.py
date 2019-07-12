@@ -275,6 +275,7 @@ Not currently enabled; click the sync button in the main window to enable."""))
         ("allowEmptyFirstField", ),
         ("noteWithoutCard", True),
         ("multipleNoteWithSameFirstFieldInImport", ),
+        ("newLineInBatchEdit",),
     ]
 
     def setupExtra(self):
