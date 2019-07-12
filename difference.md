@@ -9,6 +9,10 @@ cards. This ensure that they all belong to a same deck, while keeping
 the same deck hierarchy. `Decks > Remove prefix` allows to remove this
 common prefix and thus cancel the action `Add prefix`.
 
+## Anki quicker (802285486)
+Those modification makes anki quicker. Technical details are on the
+add-on page.
+
 ## Allow to keep first field empty (46741504)
 
 ## Allowing complex card template (1713990897)
@@ -98,6 +102,9 @@ exported cards. The problem being, of course, that you may export
 cards in decks you did not select. Thus, importing those cards may
 potentially create more decks than expected.
 
+## Frozen Fields (516643804)
+Add a small icon near the name of the field to make it sticky or not.
+
 ## Improve rendering (1551823299)
 Anki will generate cards's content (question, answer) faster. It will
 also improve the speed at which anki will save modification of card type.
@@ -110,6 +117,11 @@ their fields.
 
 If you want to remove this feature, and have anki's default, uncheck
 «Keep note without any card and warn» in the preferences.
+
+In the preferences, the button «Note with no card: create card 1
+instead of deleting the note» chage the behavior of anki when he finds
+a note which has no more card. This allow to lose the content of the
+note, and let you correct the note instead to generate cards.
 
 ## Keep seen card.
 By default, this version of anki does not delete a card if it has
@@ -137,6 +149,10 @@ day for the last month, one by month for the last year, and one by
 year. So that you can recover some old part of your collection.
 
 This can be deactivated from the back-up tab of the preferences window.
+
+## Multi column note editor (3491767031, 2064123047)
+Allow to have editors with multiple columns. Allow to keep some fields
+on their own line.
 
 ## New line in Json (112201952)
 In order to lead configurations be easier to edit, this add-on allow
