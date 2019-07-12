@@ -72,16 +72,23 @@ class Template:
         self.context = context or {}
         self.compile_regexps()
 
-    def render(self, template=None, context=None, encoding=None):
+    def render(self, *args, **kwargs):
         """Turns a Mustache template into something wonderful."""
+        return self.renderAndIsFieldPresent(*args, **kwargs)[0]
+
+    def renderAndIsFieldPresent(self, template=None, context=None, encoding=None):
+        """A pair with:
+        * Turns a Mustache template into something wonderful.
+        * whether a field was shown"""
         template = template or self.template
         context = context or self.context
 
         template = self.render_sections(template, context)
+        self.showAField = False
         result = self.render_tags(template, context)
         if encoding is not None:
             result = result.encode(encoding)
-        return result
+        return result, self.showAField
 
     def compile_regexps(self):
         """Compiles our section and tag regular expressions."""
@@ -139,8 +146,10 @@ class Template:
         return replacement
 
     def render_tags(self, template, context):
-        """Renders all the tags in a template for a context. Normally
-        {{# and {{^ are already removed."""
+        """A pair with:
+        * All the tags in a template for a context. Normally
+        {{# and {{^ are removed,
+        * whether a field is shown"""
         repCount = 0
         try:
             return self.tag_re.sub(lambda match: self.sub_tag(match, context),template)
@@ -165,7 +174,9 @@ class Template:
             # some field names could have colons in them
             # avoid interpreting these as field modifiers
             # better would probably be to put some restrictions on field names
-            return txt
+            if bool(txt.strip()):### MODIFIED
+                self.showAField = True
+            return txt### MODIFIED
 
         # field modifiers
         parts = tag_name.split(':')
@@ -176,6 +187,10 @@ class Template:
             mods, tag = parts[:-1], parts[-1] #py3k has *mods, tag = parts
 
         txt = get_or_attr(context, tag)
+        if txt is None:
+            return '{unknown field %s}' % tag_name
+        elif bool(txt.strip()):### MODIFIED
+            self.showAField = True
 
         #Since 'text:' and other mods can affect html on which Anki relies to
         #process clozes, we need to make sure clozes are always
@@ -204,8 +219,7 @@ class Template:
                 mod, extra = re.search(r"^(.*?)(?:\((.*)\))?$", mod).groups()
                 txt = runFilter('fmod_' + mod, txt or '', extra or '', context,
                                 tag, tag_name)
-                if txt is None:
-                    return '{unknown field %s}' % tag_name
+
         return txt
 
     def clozeText(self, txt, ord, type):
