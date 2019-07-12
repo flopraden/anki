@@ -132,6 +132,13 @@ In order to lead configurations be easier to edit, this add-on allow
 newline in json strings. It allow add newlines in the add-on
 configuration editor.
 
+## Open a window multiple time (354407385)
+Allows to open multiple copy of the same window.
+
+In the preferences, you can decide which you can open multiple time.
+
+TODO: do it better than using stacks
+
 ## Remove "Map to" in item import window for CSV (46741504)
 Because of this text, the keyboard can't be used to search a field. I
 thus remove it.
