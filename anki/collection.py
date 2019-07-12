@@ -531,9 +531,12 @@ crt=?, mod=?, scm=?, dty=?, usn=?, ls=?, conf=?""",
                     ts += 1
             # note any cards that need removing
             if nid in have:
-                for ord, id in list(have[nid].items()):
-                    if ord not in avail:
-                        rem.append(id)
+                for ord, cid in list(have[nid].items()):
+                    if (
+                            ((not self.conf.get("keepSeenCard", True)) or self.db.scalar(f"select id from cards where id = ? and type = {CARD_NEW}", cid))
+                            and ord not in avail
+                    ):
+                        rem.append(cid)
         # bulk update
         self.db.executemany("""
 insert into cards values (?,?,?,?,?,?,0,0,?,0,0,0,0,0,0,0,0,"")""",

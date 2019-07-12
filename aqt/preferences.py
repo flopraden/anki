@@ -275,6 +275,7 @@ Not currently enabled; click the sync button in the main window to enable."""))
         ("allowEmptyFirstField", ),
         ("changeModelWithoutFullSync", False, True, False),
         ("compileLaTeX", ),
+        ("keepSeenCard", True),
         ("noteWithoutCard", True),
         ("multipleNoteWithSameFirstFieldInImport", ),
         ("newLineInBatchEdit",),
