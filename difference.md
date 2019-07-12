@@ -96,6 +96,10 @@ If checked, the option "Delete empty cards only if they are new" set
 back «Empty cards» to its original meaning; it'll delete even the seen
 cards.
 
+## Remove "Map to" in item import window for CSV (46741504)
+Because of this text, the keyboard can't be used to search a field. I
+thus remove it.
+
 ## Usable card report (25425599)
 Add more informations in the «empty card» report.
 
