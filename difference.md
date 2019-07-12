@@ -179,6 +179,14 @@ postponing, but not totally, set a number between 0 and 1.
 The «When removing days» feature is similar to the «When adding days»,
 but consider days removed.
 
+## Tag missing media (2027876532)
+If a note is supposed to have media (image or audio), it will have the
+tag "MissingMedia", when you «check media».
+
+The prefenece "In case of missing media, show the notes in the
+browser" allows to decide whether the browser show you the list of
+notes with missing media when you check media.
+
 ## Remove "Map to" in item import window for CSV (46741504)
 Because of this text, the keyboard can't be used to search a field. I
 thus remove it.
