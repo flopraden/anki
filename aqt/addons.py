@@ -941,6 +941,7 @@ incorporatedAddonsSet = {
     Addon("Export cards selected in the Browser", 1983204951, 1560768960, "f8990da153af2745078e7b3c33854d01cb9fa304", "https://github.com/Arthur-Milchior/anki-export-from-browser"),
     Addon("If a note has no more card warns instead of deleting it", 2018640062, 1560126140, "4a854242d06a05b2ca801a0afc29760682004782", "https://github.com/Arthur-Milchior/anki-keep-empty-note"),
     Addon("Improving change note type", 513858554, 1560753393, "4ece9f1da85358bce05a75d3bbeffa91d8c17ad4", "https://github.com/Arthur-Milchior/anki-change-note-type-clozes"),
+    Addon("Improve speed of change of note type", 115825506, 1551823299, "8b125aa55a490b276019d1a2e7f6f8c0767d65b3", "https://github.com/Arthur-Milchior/anki-better-card-generation"),
     Addon("Keep model of add cards", 424778276, 1553438887, "64bdf3c7d8e252d6f69f0a423d2db3c23ce6bc04", "https://github.com/Arthur-Milchior/anki-keep-model-in-add-cards"),
     Addon("Limit number of cards by day both new and review", 602339056, 1562849512, "72f2ea268fa8b116f9aecde968dc0aa324b33636", "https://github.com/Arthur-Milchior/anki-limit-to-both-new-and-revs"),
     Addon("Long term backups", 529955533, gitHash="cf34f99c6c74e11b49928adb6876123fd1fa83dd", gitRepo = "https://github.com/Arthur-Milchior/anki-old-backup"),
