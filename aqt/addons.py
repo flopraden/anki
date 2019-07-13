@@ -949,7 +949,7 @@ incorporatedAddonsSet = {
     Addon("Keep model of add cards", 424778276, 1553438887, "64bdf3c7d8e252d6f69f0a423d2db3c23ce6bc04", "https://github.com/Arthur-Milchior/anki-keep-model-in-add-cards"),
     Addon("Limit number of cards by day both new and review", 602339056, 1562849512, "72f2ea268fa8b116f9aecde968dc0aa324b33636", "https://github.com/Arthur-Milchior/anki-limit-to-both-new-and-revs"),
     Addon("Long term backups", 529955533, gitHash="cf34f99c6c74e11b49928adb6876123fd1fa83dd", gitRepo = "https://github.com/Arthur-Milchior/anki-old-backup"),
-    Addon("More consistent cards generation", 1713990897, 1562332573, "09567afa0fdfc03474e4c52298d2529556c2ffad", "https://github.com/Arthur-Milchior/anki-correct-card-generation"),
+    Addon("More consistent cards generation", 1713990897, 1562981270, "211e013581240d2f4a6b45e811d59adf17fc1862", "https://github.com/Arthur-Milchior/anki-correct-card-generation"),
     Addon("Multi-column note editor", 3491767031, 1560844854, "ad7a4014f184a1ec5d5d5c43a3fc4bab8bb8f6df", "https://github.com/hssm/anki-addons/tree/master/multi_column_editor"),
     Addon("Multi-column note editor debugged", 2064123047, 1550534156, "70f92cd5f62bd4feda5422701bd01acb41ed48ce", "https://github.com/Arthur-Milchior/anki-Multi-column-edit-window"),
     Addon("Newline in strings in add-ons configurations", 112201952, 1560116341, "c02ac9bbbc68212da3d2bccb65ad5599f9f5af97", "https://github.com/Arthur-Milchior/anki-json-new-line"),
